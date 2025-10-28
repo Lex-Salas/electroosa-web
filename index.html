@@ -1,12 +1,165 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Electroosa</title>
+    <title>Electroosa ⚡ | Energía Inteligente</title>
+
+    <style>
+      /* ====== ESTILO BASE ====== */
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: radial-gradient(circle at top left, #020202, #0c0c0c 80%);
+        color: #fff;
+      }
+
+      header {
+        background: linear-gradient(90deg, #001b4d, #007bff);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      header img {
+        height: 55px;
+      }
+
+      nav a {
+        color: #fff;
+        text-decoration: none;
+        margin-left: 20px;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      nav a:hover {
+        color: #f1c40f;
+      }
+
+      .hero {
+        text-align: center;
+        padding: 100px 20px;
+        background: linear-gradient(135deg, #001b4d, #000);
+        border-bottom: 3px solid #007bff;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        color: #f1c40f;
+        text-shadow: 0 0 15px #007bff;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 20px auto;
+        color: #ddd;
+      }
+
+      .services {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 60px 20px;
+        background: #0e0e0e;
+      }
+
+      .service-card {
+        background: #111;
+        border: 1px solid #1e1e1e;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 0 20px #007bff44;
+      }
+
+      .service-card h3 {
+        color: #f1c40f;
+      }
+
+      footer {
+        background: #000814;
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9rem;
+        border-top: 1px solid #111;
+      }
+
+      footer a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        color: #f1c40f;
+      }
+    </style>
   </head>
-  <body class="bg-gray-900 text-white">
-    <div id="root"></div>
-    <script type="module" src="/src/App.jsx"></script>
+
+  <body>
+    <header>
+      <img src="logo.png" alt="Logo Electroosa" />
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Servicios</a>
+        <a href="#">Cotizador</a>
+        <a href="#">Contacto</a>
+        <a href="#">Login</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Energía Inteligente para tu Hogar ⚡</h1>
+      <p>
+        En <strong>Electroosa</strong> brindamos soluciones en electricidad
+        residencial, mantenimiento industrial, paneles solares y domótica.
+      </p>
+    </section>
+
+    <section class="services">
+      <div class="service-card">
+        <h3>⚡ Electricidad Residencial</h3>
+        <p>
+          Instalaciones seguras, modernas y eficientes para hogares y
+          residencias.
+        </p>
+      </div>
+
+      <div class="service-card">
+        <h3>🔋 Paneles Solares</h3>
+        <p>
+          Energía limpia y sostenible con sistemas solares personalizados.
+        </p>
+      </div>
+
+      <div class="service-card">
+        <h3>🏠 Domótica</h3>
+        <p>
+          Automatiza tu casa con tecnología inteligente para mayor confort y
+          ahorro.
+        </p>
+      </div>
+
+      <div class="service-card">
+        <h3>🧰 Mantenimiento</h3>
+        <p>
+          Revisión, reparación y mantenimiento de sistemas eléctricos y
+          energéticos.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      © 2025 Electroosa. Todos los derechos reservados. |
+      <a href="#">Política de Privacidad</a>
+    </footer>
   </body>
 </html>
