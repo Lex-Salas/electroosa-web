@@ -48,22 +48,23 @@
         // Logo Component usando la imagen real
         const LogoElectrosa = ({ className, onClick }) => (
             <div 
-                className={`flex items-center gap-3 cursor-pointer logo-container ${className}`}
+                className={`flex items-center cursor-pointer logo-container ${className}`}
                 onClick={onClick}
             >
                 <img 
-                    src="https://i.imgur.com/placeholder.png" 
-                    alt="ELECTROOSA Logo"
-                    className="h-12 w-auto"
+                    src="https://i.imgur.com/ZpS0U5A.png" 
+                    alt="ELECTROOSA - Electrical Specialized"
+                    className="h-14 w-auto md:h-16"
                     onError={(e) => {
-                        // Fallback si la imagen no carga
+                        // Fallback si la imagen no carga - mostrar texto
                         e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'flex';
+                        const fallback = e.target.nextElementSibling;
+                        if (fallback) fallback.style.display = 'flex';
                     }}
                 />
-                <div className="flex flex-col">
+                <div className="hidden flex-col">
                     <span className="text-2xl font-bold text-white tracking-tight">ELECTROOSA</span>
-                    <span className="text-xs text-blue-400 uppercase tracking-wider">Electrical Specialized</span>
+                    <span className="text-xs text-yellow-500 uppercase tracking-wider">Electrical Specialized</span>
                 </div>
             </div>
         );
