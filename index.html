@@ -9,8 +9,8 @@
     <title>ELECTROSA - Electrical Specialized | Costa Rica</title>
     
     <!-- React y Babel -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Tailwind CSS -->
@@ -37,6 +37,95 @@
             transform: scale(1.05);
             transition: transform 0.3s ease;
         }
+
+        /* Estilos para el chatbot de WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-decoration: none;
+        }
+        
+        /* Estilo para bandera selector de idioma */
+        .language-selector {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .language-selector:hover {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        /* Estilos para galería de proyectos */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            height: 250px;
+        }
+        
+        .project-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        .project-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover .project-overlay {
+            transform: translateY(0);
+        }
+        
+        /* Estilos para certificaciones */
+        .certification-card {
+            background: linear-gradient(to bottom right, #1f2937, #111827);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .certification-card:hover {
+            border-color: rgba(245, 158, 11, 0.5);
+            transform: translateY(-5px);
+        }
     </style>
 </head>
 <body>
@@ -45,37 +134,33 @@
     <script type="text/babel">
         const { useState } = React;
         
-        // Logo Component usando la imagen real
+        // Logo Component - Solo imagen más grande, sin texto
         const LogoElectrosa = ({ className, onClick }) => (
             <div 
                 className={`flex items-center cursor-pointer logo-container ${className}`}
                 onClick={onClick}
             >
+                {/* Logo más grande sin texto */}
                 <img 
                     src="https://i.imgur.com/ZpS0U5A.png" 
-                    alt="ELECTROOSA - Electrical Specialized"
-                    className="h-14 w-auto md:h-16"
+                    alt="ELECTROSA - Electrical Specialized"
+                    className="h-16 w-auto md:h-20"
                     onError={(e) => {
                         // Fallback si la imagen no carga - mostrar texto
                         e.target.style.display = 'none';
-                        const fallback = e.target.nextElementSibling;
-                        if (fallback) fallback.style.display = 'flex';
+                        const fallback = document.getElementById('logo-fallback');
+                        if (fallback) fallback.classList.remove('hidden');
                     }}
                 />
-                <div className="hidden flex-col">
-                    <span className="text-2xl font-bold text-white tracking-tight">ELECTROSA</span>
-                    <span className="text-xs text-yellow-500 uppercase tracking-wider">Electrical Specialized</span>
+                
+                {/* Fallback en caso de que la imagen no cargue */}
+                <div id="logo-fallback" className="hidden">
+                    <div className="text-2xl font-bold text-white tracking-tight">ELECTROSA</div>
                 </div>
             </div>
         );
         
         // Iconos SVG
-        const Zap = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-        );
-        
         const Menu = ({ className }) => (
             <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -113,27 +198,22 @@
             </svg>
         );
         
+        // Nuevo ícono para Electricidad Comercial
+        const Building = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+        );
+        
         const Mail = ({ className }) => (
             <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
         );
         
-        const Calculator = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-        );
-        
         const User = ({ className }) => (
             <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-        );
-        
-        const CreditCard = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
         );
         
@@ -180,48 +260,232 @@
             </svg>
         );
 
+        const Briefcase = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+        );
+
         const ElectroosaApp = () => {
           const [currentPage, setCurrentPage] = useState('home');
           const [menuOpen, setMenuOpen] = useState(false);
           const [isLoggedIn, setIsLoggedIn] = useState(false);
-          const [cotizacion, setCotizacion] = useState({
-            servicio: '',
-            area: '',
-            contacto: ''
-          });
+          const [language, setLanguage] = useState('es');
+          const [selectedService, setSelectedService] = useState(null);
+
+          // Textos en español
+          const textsEs = {
+            home: "Inicio",
+            services: "Servicios",
+            contact: "Contacto",
+            login: "Iniciar Sesión",
+            account: "Mi Cuenta",
+            slogan: "Electrical Specialized",
+            mainTitle: "Energizamos Tu Futuro",
+            description: "Expertos en electricidad residencial, energía solar, domótica y mantenimiento eléctrico con más de 15 años de experiencia en Costa Rica",
+            ourServices: "Nuestros Servicios",
+            contactNow: "Contactar Ahora",
+            seeDetails: "Ver detalles de servicios",
+            residentialElectricity: "Electricidad Residencial",
+            electricalMaintenance: "Mantenimiento Eléctrico",
+            solarPanels: "Paneles Solares",
+            homeAutomation: "Domótica",
+            commercialElectricity: "Electricidad Comercial",
+            certifiedQuality: "Calidad Certificada",
+            totalSecurity: "Seguridad Total",
+            expertTeam: "Equipo Experto",
+            contactUs: "Contáctanos",
+            phone: "Teléfono",
+            email: "Email",
+            location: "Ubicación",
+            schedule: "Horario",
+            name: "Nombre",
+            message: "Mensaje",
+            sendMessage: "Enviar Mensaje",
+            clientPortal: "Portal de Clientes",
+            accessAccount: "Accede a tu cuenta ELECTROSA",
+            password: "Contraseña",
+            forgotPassword: "¿Olvidaste tu contraseña?",
+            welcomeBack: "Bienvenido de nuevo",
+            myProfile: "Mi Perfil",
+            myProjects: "Mis Proyectos",
+            messages: "Mensajes",
+            logout: "Cerrar Sesión",
+            company: "Empresa",
+            aboutUs: "Sobre Nosotros",
+            projects: "Proyectos",
+            certifications: "Certificaciones",
+            workWithUs: "Trabaja con Nosotros",
+            rights: "Todos los derechos reservados",
+            emergency: "Emergencias 24/7",
+            projectsCompleted: "Proyectos Completados",
+            yearsExperience: "Años de Experiencia",
+            satisfiedClients: "Clientes Satisfechos",
+            technicalSupport: "Soporte Técnico",
+            solutions: "Soluciones eléctricas integrales para cada necesidad",
+            quote: "Cotizar",
+            projectArea: "Área del Proyecto (m²)",
+            projectDescription: "Descripción del Proyecto",
+            fullName: "Nombre Completo",
+            requestQuote: "Solicitar Cotización",
+            selectService: "Selecciona un servicio",
+            ourStory: "Nuestra Historia",
+            mission: "Misión",
+            vision: "Visión",
+            values: "Valores",
+            ourTeam: "Nuestro Equipo",
+            viewGallery: "Ver Galería",
+            applyNow: "Aplicar Ahora",
+            position: "Posición",
+            uploadResume: "Subir Currículum",
+            submitApplication: "Enviar Solicitud",
+            certificationName: "Nombre de Certificación",
+            issuingOrganization: "Organización Emisora",
+            yearObtained: "Año Obtenido",
+            viewCertificate: "Ver Certificado"
+          };
+
+          // Textos en inglés
+          const textsEn = {
+            home: "Home",
+            services: "Services",
+            contact: "Contact",
+            login: "Login",
+            account: "My Account",
+            slogan: "Electrical Specialized",
+            mainTitle: "Powering Your Future",
+            description: "Experts in residential electricity, solar energy, home automation and electrical maintenance with over 15 years of experience in Costa Rica",
+            ourServices: "Our Services",
+            contactNow: "Contact Now",
+            seeDetails: "See service details",
+            residentialElectricity: "Residential Electricity",
+            electricalMaintenance: "Electrical Maintenance",
+            solarPanels: "Solar Panels",
+            homeAutomation: "Home Automation",
+            commercialElectricity: "Commercial Electricity",
+            certifiedQuality: "Certified Quality",
+            totalSecurity: "Total Security",
+            expertTeam: "Expert Team",
+            contactUs: "Contact Us",
+            phone: "Phone",
+            email: "Email",
+            location: "Location",
+            schedule: "Schedule",
+            name: "Name",
+            message: "Message",
+            sendMessage: "Send Message",
+            clientPortal: "Client Portal",
+            accessAccount: "Access your ELECTROSA account",
+            password: "Password",
+            forgotPassword: "Forgot your password?",
+            welcomeBack: "Welcome back",
+            myProfile: "My Profile",
+            myProjects: "My Projects",
+            messages: "Messages",
+            logout: "Logout",
+            company: "Company",
+            aboutUs: "About Us",
+            projects: "Projects",
+            certifications: "Certifications",
+            workWithUs: "Work With Us",
+            rights: "All rights reserved",
+            emergency: "24/7 Emergencies",
+            projectsCompleted: "Projects Completed",
+            yearsExperience: "Years of Experience",
+            satisfiedClients: "Satisfied Clients",
+            technicalSupport: "Technical Support",
+            solutions: "Comprehensive electrical solutions for every need",
+            quote: "Get Quote",
+            projectArea: "Project Area (m²)",
+            projectDescription: "Project Description",
+            fullName: "Full Name",
+            requestQuote: "Request Quote",
+            selectService: "Select a service",
+            ourStory: "Our Story",
+            mission: "Mission",
+            vision: "Vision",
+            values: "Values",
+            ourTeam: "Our Team",
+            viewGallery: "View Gallery",
+            applyNow: "Apply Now",
+            position: "Position",
+            uploadResume: "Upload Resume",
+            submitApplication: "Submit Application",
+            certificationName: "Certification Name",
+            issuingOrganization: "Issuing Organization",
+            yearObtained: "Year Obtained",
+            viewCertificate: "View Certificate"
+          };
+
+          const texts = language === 'es' ? textsEs : textsEn;
 
           const servicios = [
             {
               icon: <Home className="w-12 h-12" />,
-              titulo: "Electricidad Residencial",
-              descripcion: "Instalaciones eléctricas completas, remodelaciones y actualizaciones para tu hogar.",
-              caracteristicas: ["Instalación completa", "Reparaciones", "Certificaciones"]
+              titulo: texts.residentialElectricity,
+              descripcion: language === 'es' ? "Instalaciones eléctricas completas, remodelaciones y actualizaciones para tu hogar." : "Complete electrical installations, renovations and updates for your home.",
+              caracteristicas: language === 'es' ? ["Instalación completa", "Reparaciones", "Certificaciones"] : ["Complete installation", "Repairs", "Certifications"]
             },
             {
               icon: <Wrench className="w-12 h-12" />,
-              titulo: "Mantenimiento Eléctrico",
-              descripcion: "Mantenimiento preventivo y correctivo para garantizar el funcionamiento óptimo.",
-              caracteristicas: ["Revisiones periódicas", "Diagnóstico", "Reparaciones urgentes"]
+              titulo: texts.electricalMaintenance,
+              descripcion: language === 'es' ? "Mantenimiento preventivo y correctivo para garantizar el funcionamiento óptimo." : "Preventive and corrective maintenance to ensure optimal performance.",
+              caracteristicas: language === 'es' ? ["Revisiones periódicas", "Diagnóstico", "Reparaciones urgentes"] : ["Periodic reviews", "Diagnosis", "Urgent repairs"]
             },
             {
               icon: <Sun className="w-12 h-12" />,
-              titulo: "Paneles Solares",
-              descripcion: "Soluciones de energía renovable con instalación y mantenimiento de sistemas fotovoltaicos.",
-              caracteristicas: ["Instalación", "Monitoreo", "Mantenimiento"]
+              titulo: texts.solarPanels,
+              descripcion: language === 'es' ? "Soluciones de energía renovable con instalación y mantenimiento de sistemas fotovoltaicos." : "Renewable energy solutions with installation and maintenance of photovoltaic systems.",
+              caracteristicas: language === 'es' ? ["Instalación", "Monitoreo", "Mantenimiento"] : ["Installation", "Monitoring", "Maintenance"]
             },
             {
               icon: <Cpu className="w-12 h-12" />,
-              titulo: "Domótica",
-              descripcion: "Automatización inteligente para tu hogar o negocio con la última tecnología.",
-              caracteristicas: ["Automatización", "Control remoto", "Integración"]
+              titulo: texts.homeAutomation,
+              descripcion: language === 'es' ? "Automatización inteligente para tu hogar o negocio con la última tecnología." : "Smart automation for your home or business with the latest technology.",
+              caracteristicas: language === 'es' ? ["Automatización", "Control remoto", "Integración"] : ["Automation", "Remote control", "Integration"]
+            },
+            {
+              icon: <Building className="w-12 h-12" />,
+              titulo: texts.commercialElectricity,
+              descripcion: language === 'es' ? "Instalaciones eléctricas comerciales e industriales con los más altos estándares de seguridad." : "Commercial and industrial electrical installations with the highest safety standards.",
+              caracteristicas: language === 'es' ? ["Instalaciones comerciales", "Sistemas trifásicos", "Optimización energética"] : ["Commercial installations", "Three-phase systems", "Energy optimization"]
             }
           ];
 
           const stats = [
-            { numero: "500+", texto: "Proyectos Completados" },
-            { numero: "15+", texto: "Años de Experiencia" },
-            { numero: "98%", texto: "Clientes Satisfechos" },
-            { numero: "24/7", texto: "Soporte Técnico" }
+            { numero: "500+", texto: texts.projectsCompleted },
+            { numero: "15+", texto: texts.yearsExperience },
+            { numero: "98%", texto: texts.satisfiedClients },
+            { numero: "24/7", texto: texts.technicalSupport }
+          ];
+
+          // Datos de ejemplo para proyectos
+          const projects = [
+            { id: 1, title: "Instalación Residencial", location: "San José", description: "Instalación eléctrica completa en residencia de lujo", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" },
+            { id: 2, title: "Sistema Solar Comercial", location: "Alajuela", description: "Instalación de paneles solares para empresa", image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" },
+            { id: 3, title: "Domótica Residencial", location: "Heredia", description: "Automatización completa de vivienda inteligente", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" },
+            { id: 4, title: "Mantenimiento Industrial", location: "Cartago", description: "Mantenimiento eléctrico preventivo en planta industrial", image: "https://images.unsplash.com/photo-1560520031-3a4dc4e9de0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" },
+            { id: 5, title: "Electricidad Comercial", location: "Puntarenas", description: "Instalación eléctrica en centro comercial", image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" },
+            { id: 6, title: "Sistema de Emergencia", location: "Guanacaste", description: "Instalación de sistema de energía de respaldo", image: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" }
+          ];
+
+          // Datos de ejemplo para certificaciones
+          const certifications = [
+            { id: 1, name: "Certificación en Instalaciones Eléctricas", organization: "Colegio Federado de Ingenieros y Arquitectos", year: "2020" },
+            { id: 2, name: "Especialización en Energía Solar", organization: "Instituto Costarricense de Electricidad", year: "2019" },
+            { id: 3, name: "Certificación en Domótica", organization: "Asociación Costarricense de Electricidad", year: "2021" },
+            { id: 4, name: "Seguridad Eléctrica Industrial", organization: "Ministerio de Salud", year: "2018" },
+            { id: 5, name: "Instalaciones Comerciales", organization: "Cámara de Comercio", year: "2022" },
+            { id: 6, name: "Mantenimiento Preventivo", organization: "Asociación de Electricistas Certificados", year: "2020" }
+          ];
+
+          // Datos de ejemplo para posiciones de trabajo
+          const jobPositions = [
+            { id: 1, title: "Electricista Residencial", location: "San José", type: "Tiempo Completo" },
+            { id: 2, title: "Técnico en Paneles Solares", location: "Alajuela", type: "Tiempo Completo" },
+            { id: 3, title: "Especialista en Domótica", location: "Heredia", type: "Medio Tiempo" },
+            { id: 4, title: "Electricista Industrial", location: "Cartago", type: "Tiempo Completo" },
+            { id: 5, title: "Ayudante de Electricista", location: "Puntarenas", type: "Aprendiz" }
           ];
 
           const NavBar = () => (
@@ -231,30 +495,55 @@
                   <LogoElectrosa onClick={() => setCurrentPage('home')} />
                   
                   <div className="hidden md:flex items-center gap-6">
-                    <button onClick={() => setCurrentPage('home')} className={`${currentPage === 'home' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>Inicio</button>
-                    <button onClick={() => setCurrentPage('servicios')} className={`${currentPage === 'servicios' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>Servicios</button>
-                    <button onClick={() => setCurrentPage('cotizador')} className={`${currentPage === 'cotizador' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>Cotizador</button>
-                    <button onClick={() => setCurrentPage('contacto')} className={`${currentPage === 'contacto' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>Contacto</button>
+                    <button onClick={() => setCurrentPage('home')} className={`${currentPage === 'home' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.home}</button>
+                    <button onClick={() => setCurrentPage('servicios')} className={`${currentPage === 'servicios' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.services}</button>
+                    <button onClick={() => setCurrentPage('aboutus')} className={`${currentPage === 'aboutus' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.aboutUs}</button>
+                    <button onClick={() => setCurrentPage('projects')} className={`${currentPage === 'projects' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.projects}</button>
+                    <button onClick={() => setCurrentPage('certifications')} className={`${currentPage === 'certifications' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.certifications}</button>
+                    <button onClick={() => setCurrentPage('workwithus')} className={`${currentPage === 'workwithus' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.workWithUs}</button>
+                    <button onClick={() => setCurrentPage('contacto')} className={`${currentPage === 'contacto' ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-400 transition font-medium`}>{texts.contact}</button>
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                        className="language-selector text-white"
+                      >
+                        {language === 'es' ? 'EN' : 'ES'}
+                      </button>
+                    </div>
+                    
                     <button onClick={() => setCurrentPage('login')} className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-4 py-2 rounded-lg flex items-center gap-2 transition font-semibold">
                       <User className="w-4 h-4" />
-                      {isLoggedIn ? 'Mi Cuenta' : 'Login'}
+                      {isLoggedIn ? texts.account : texts.login}
                     </button>
                   </div>
 
-                  <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
-                    {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                  </button>
+                  <div className="flex items-center gap-4 md:hidden">
+                    <button 
+                      onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                      className="language-selector text-white"
+                    >
+                      {language === 'es' ? 'EN' : 'ES'}
+                    </button>
+                    
+                    <button className="text-white" onClick={() => setMenuOpen(!menuOpen)}>
+                      {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {menuOpen && (
                 <div className="md:hidden bg-gray-900 border-t border-yellow-600/30">
                   <div className="px-4 py-3 space-y-3">
-                    <button onClick={() => { setCurrentPage('home'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">Inicio</button>
-                    <button onClick={() => { setCurrentPage('servicios'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">Servicios</button>
-                    <button onClick={() => { setCurrentPage('cotizador'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">Cotizador</button>
-                    <button onClick={() => { setCurrentPage('contacto'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">Contacto</button>
-                    <button onClick={() => { setCurrentPage('login'); setMenuOpen(false); }} className="block w-full text-left text-yellow-500 hover:text-yellow-400 py-2">Login</button>
+                    <button onClick={() => { setCurrentPage('home'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.home}</button>
+                    <button onClick={() => { setCurrentPage('servicios'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.services}</button>
+                    <button onClick={() => { setCurrentPage('aboutus'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.aboutUs}</button>
+                    <button onClick={() => { setCurrentPage('projects'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.projects}</button>
+                    <button onClick={() => { setCurrentPage('certifications'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.certifications}</button>
+                    <button onClick={() => { setCurrentPage('workwithus'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.workWithUs}</button>
+                    <button onClick={() => { setCurrentPage('contacto'); setMenuOpen(false); }} className="block w-full text-left text-gray-300 hover:text-yellow-400 py-2">{texts.contact}</button>
+                    <button onClick={() => { setCurrentPage('login'); setMenuOpen(false); }} className="block w-full text-left text-yellow-500 hover:text-yellow-400 py-2">{texts.login}</button>
                   </div>
                 </div>
               )}
@@ -269,22 +558,22 @@
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                   <div className="text-center">
                     <div className="inline-block mb-6 px-6 py-2 bg-yellow-600/20 rounded-full border border-yellow-500/40">
-                      <span className="text-yellow-500 text-sm font-semibold uppercase tracking-wider">Electrical Specialized</span>
+                      <span className="text-yellow-500 text-sm font-semibold uppercase tracking-wider">{texts.slogan}</span>
                     </div>
                     <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                      Energizamos<br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600">Tu Futuro</span>
+                      {language === 'es' ? 'Energizamos' : 'Powering'}<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600">{language === 'es' ? 'Tu Futuro' : 'Your Future'}</span>
                     </h1>
                     <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
-                      Expertos en electricidad residencial, energía solar, domótica y mantenimiento eléctrico con más de 15 años de experiencia en Costa Rica
+                      {texts.description}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button onClick={() => setCurrentPage('cotizador')} className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-8 py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 transition shadow-lg shadow-yellow-600/50 transform hover:scale-105">
-                        Solicitar Cotización
+                      <button onClick={() => setCurrentPage('servicios')} className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-8 py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 transition shadow-lg shadow-yellow-600/50 transform hover:scale-105">
+                        {texts.ourServices}
                         <ChevronRight className="w-6 h-6" />
                       </button>
-                      <button onClick={() => setCurrentPage('servicios')} className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold border-2 border-white/30 transition transform hover:scale-105">
-                        Explorar Servicios
+                      <button onClick={() => setCurrentPage('contacto')} className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold border-2 border-white/30 transition transform hover:scale-105">
+                        {texts.contactNow}
                       </button>
                     </div>
                   </div>
@@ -309,12 +598,12 @@
               <div className="bg-gradient-to-b from-black to-gray-900 py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="text-center mb-16">
-                    <h2 className="text-5xl font-bold text-white mb-4">Nuestros Servicios</h2>
-                    <p className="text-gray-400 text-lg">Soluciones eléctricas integrales para cada necesidad</p>
+                    <h2 className="text-5xl font-bold text-white mb-4">{texts.ourServices}</h2>
+                    <p className="text-gray-400 text-lg">{texts.solutions}</p>
                   </div>
                   
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {servicios.map((servicio, i) => (
+                    {servicios.slice(0, 4).map((servicio, i) => (
                       <div key={i} className="bg-gradient-to-br from-gray-900 to-black p-8 rounded-2xl border border-yellow-600/20 hover:border-yellow-500/50 transition group cursor-pointer transform hover:scale-105 hover:shadow-xl hover:shadow-yellow-600/20">
                         <div className="text-yellow-500 group-hover:text-yellow-400 transition mb-6">
                           {servicio.icon}
@@ -327,7 +616,7 @@
 
                   <div className="text-center mt-12">
                     <button onClick={() => setCurrentPage('servicios')} className="text-yellow-500 hover:text-yellow-400 font-semibold flex items-center gap-2 mx-auto transition text-lg">
-                      Ver detalles de servicios
+                      {texts.seeDetails}
                       <ChevronRight className="w-5 h-5" />
                     </button>
                   </div>
@@ -342,8 +631,8 @@
                         <Award className="w-10 h-10 text-yellow-500" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">Calidad Certificada</h3>
-                        <p className="text-gray-400">Trabajos garantizados con certificaciones profesionales internacionales</p>
+                        <h3 className="text-2xl font-bold text-white mb-2">{texts.certifiedQuality}</h3>
+                        <p className="text-gray-400">{language === 'es' ? "Trabajos garantizados con certificaciones profesionales internacionales" : "Guaranteed work with international professional certifications"}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
@@ -351,8 +640,8 @@
                         <Shield className="w-10 h-10 text-yellow-500" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">Seguridad Total</h3>
-                        <p className="text-gray-400">Cumplimiento riguroso de normas de seguridad eléctrica</p>
+                        <h3 className="text-2xl font-bold text-white mb-2">{texts.totalSecurity}</h3>
+                        <p className="text-gray-400">{language === 'es' ? "Cumplimiento riguroso de normas de seguridad eléctrica" : "Rigorous compliance with electrical safety standards"}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
@@ -360,8 +649,8 @@
                         <Users className="w-10 h-10 text-yellow-500" />
                       </div>
                       <div>
-                        <h3 className="text-2xl font-bold text-white mb-2">Equipo Experto</h3>
-                        <p className="text-gray-400">Técnicos especializados y certificados con años de experiencia</p>
+                        <h3 className="text-2xl font-bold text-white mb-2">{texts.expertTeam}</h3>
+                        <p className="text-gray-400">{language === 'es' ? "Técnicos especializados y certificados con años de experiencia" : "Specialized and certified technicians with years of experience"}</p>
                       </div>
                     </div>
                   </div>
@@ -374,8 +663,8 @@
             <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <div className="text-center mb-16">
-                  <h1 className="text-5xl font-bold text-white mb-4">Nuestros Servicios</h1>
-                  <p className="text-gray-400 text-lg">Soluciones eléctricas profesionales para cada necesidad</p>
+                  <h1 className="text-5xl font-bold text-white mb-4">{texts.ourServices}</h1>
+                  <p className="text-gray-400 text-lg">{texts.solutions}</p>
                 </div>
 
                 <div className="space-y-8">
@@ -398,8 +687,14 @@
                             </div>
                           </div>
                           <div className="flex items-center">
-                            <button onClick={() => setCurrentPage('cotizador')} className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-8 py-4 rounded-lg font-bold transition transform hover:scale-105">
-                              Cotizar Ahora
+                            <button 
+                              onClick={() => {
+                                setSelectedService(servicio.titulo);
+                                setCurrentPage('cotizacion');
+                              }} 
+                              className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-8 py-4 rounded-lg font-bold transition transform hover:scale-105"
+                            >
+                              {texts.quote}
                             </button>
                           </div>
                         </div>
@@ -411,102 +706,355 @@
             </div>
           );
 
-          const CotizadorPage = () => (
+          const AboutUsPage = () => (
             <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
-              <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div className="text-center mb-12">
-                  <Calculator className="w-20 h-20 text-yellow-500 mx-auto mb-4" />
-                  <h1 className="text-5xl font-bold text-white mb-4">Cotizador de Servicios</h1>
-                  <p className="text-gray-400 text-lg">Recibe una cotización personalizada para tu proyecto</p>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="text-center mb-16">
+                  <h1 className="text-5xl font-bold text-white mb-4">{texts.aboutUs}</h1>
+                  <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+                    {language === 'es' 
+                      ? "Más de 15 años brindando soluciones eléctricas de calidad en Costa Rica"
+                      : "Over 15 years providing quality electrical solutions in Costa Rica"}
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-12 mb-16">
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-6">{texts.ourStory}</h2>
+                    <p className="text-gray-400 mb-4">
+                      {language === 'es' 
+                        ? "ELECTROSA nació en 2008 con la visión de revolucionar el sector eléctrico en Costa Rica. Fundada por un grupo de ingenieros eléctricos con amplia experiencia, nuestra empresa se ha consolidado como líder en el mercado."
+                        : "ELECTROSA was born in 2008 with the vision of revolutionizing the electrical sector in Costa Rica. Founded by a group of electrical engineers with extensive experience, our company has established itself as a market leader."}
+                    </p>
+                    <p className="text-gray-400">
+                      {language === 'es' 
+                        ? "A lo largo de los años, hemos crecido y nos hemos adaptado a las nuevas tecnologías, siempre manteniendo nuestro compromiso con la calidad, seguridad y satisfacción del cliente."
+                        : "Over the years, we have grown and adapted to new technologies, always maintaining our commitment to quality, safety and customer satisfaction."}
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
+                    <h3 className="text-2xl font-bold text-white mb-4">{texts.mission}</h3>
+                    <p className="text-gray-400 mb-6">
+                      {language === 'es' 
+                        ? "Proveer soluciones eléctricas innovadoras, seguras y sostenibles que mejoren la calidad de vida de nuestros clientes y contribuyan al desarrollo de Costa Rica."
+                        : "To provide innovative, safe and sustainable electrical solutions that improve our customers' quality of life and contribute to the development of Costa Rica."}
+                    </p>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-4">{texts.vision}</h3>
+                    <p className="text-gray-400 mb-6">
+                      {language === 'es' 
+                        ? "Ser la empresa líder en soluciones eléctricas integrales en Costa Rica, reconocida por nuestra excelencia, innovación y compromiso con el medio ambiente."
+                        : "To be the leading company in comprehensive electrical solutions in Costa Rica, recognized for our excellence, innovation and commitment to the environment."}
+                    </p>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-4">{texts.values}</h3>
+                    <ul className="text-gray-400 list-disc pl-5 space-y-2">
+                      <li>{language === 'es' ? "Calidad en cada proyecto" : "Quality in every project"}</li>
+                      <li>{language === 'es' ? "Innovación constante" : "Constant innovation"}</li>
+                      <li>{language === 'es' ? "Compromiso con la seguridad" : "Commitment to safety"}</li>
+                      <li>{language === 'es' ? "Responsabilidad ambiental" : "Environmental responsibility"}</li>
+                      <li>{language === 'es' ? "Excelencia en el servicio" : "Service excellence"}</li>
+                    </ul>
+                  </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
-                  <form className="space-y-6">
-                    <div>
-                      <label className="block text-gray-300 mb-2 font-semibold text-lg">Servicio Requerido</label>
-                      <select 
-                        value={cotizacion.servicio}
-                        onChange={(e) => setCotizacion({...cotizacion, servicio: e.target.value})}
-                        className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
-                      >
-                        <option value="">Selecciona un servicio</option>
-                        <option value="residencial">Electricidad Residencial</option>
-                        <option value="mantenimiento">Mantenimiento Eléctrico</option>
-                        <option value="solar">Paneles Solares</option>
-                        <option value="domotica">Domótica</option>
-                      </select>
+                  <h2 className="text-3xl font-bold text-white mb-8 text-center">{texts.ourTeam}</h2>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    <div className="text-center">
+                      <div className="bg-yellow-600/20 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <Users className="w-16 h-16 text-yellow-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">{language === 'es' ? "Ingenieros Certificados" : "Certified Engineers"}</h3>
+                      <p className="text-gray-400">
+                        {language === 'es' 
+                          ? "Profesionales con certificaciones internacionales y amplia experiencia"
+                          : "Professionals with international certifications and extensive experience"}
+                      </p>
                     </div>
-
-                    <div>
-                      <label className="block text-gray-300 mb-2 font-semibold text-lg">Área del Proyecto (m²)</label>
-                      <input 
-                        type="number"
-                        value={cotizacion.area}
-                        onChange={(e) => setCotizacion({...cotizacion, area: e.target.value})}
-                        placeholder="Ej: 100"
-                        className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
-                      />
+                    
+                    <div className="text-center">
+                      <div className="bg-yellow-600/20 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <Wrench className="w-16 h-16 text-yellow-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">{language === 'es' ? "Técnicos Especializados" : "Specialized Technicians"}</h3>
+                      <p className="text-gray-400">
+                        {language === 'es' 
+                          ? "Equipo técnico capacitado en las últimas tecnologías"
+                          : "Technical team trained in the latest technologies"}
+                      </p>
                     </div>
-
-                    <div>
-                      <label className="block text-gray-300 mb-2 font-semibold text-lg">Descripción del Proyecto</label>
-                      <textarea 
-                        rows="4"
-                        placeholder="Describe tu proyecto..."
-                        className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
-                      />
+                    
+                    <div className="text-center">
+                      <div className="bg-yellow-600/20 w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <Sun className="w-16 h-16 text-yellow-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">{language === 'es' ? "Especialistas en Energía Solar" : "Solar Energy Specialists"}</h3>
+                      <p className="text-gray-400">
+                        {language === 'es' 
+                          ? "Expertos en instalación y mantenimiento de sistemas fotovoltaicos"
+                          : "Experts in installation and maintenance of photovoltaic systems"}
+                      </p>
                     </div>
-
-                    <div>
-                      <label className="block text-gray-300 mb-2 font-semibold text-lg">Nombre Completo</label>
-                      <input 
-                        type="text"
-                        placeholder="Tu nombre"
-                        className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-300 mb-2 font-semibold text-lg">Teléfono</label>
-                      <input 
-                        type="tel"
-                        value={cotizacion.contacto}
-                        onChange={(e) => setCotizacion({...cotizacion, contacto: e.target.value})}
-                        placeholder="8888-0000"
-                        className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-300 mb-2 font-semibold text-lg">Email</label>
-                      <input 
-                        type="email"
-                        placeholder="tu@email.com"
-                        className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
-                      />
-                    </div>
-
-                    <button type="submit" className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-4 rounded-lg font-bold text-lg transition shadow-lg shadow-yellow-600/50 flex items-center justify-center gap-2 transform hover:scale-105">
-                      Solicitar Cotización
-                      <ChevronRight className="w-6 h-6" />
-                    </button>
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>
           );
 
+          const ProjectsPage = () => (
+            <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="text-center mb-16">
+                  <h1 className="text-5xl font-bold text-white mb-4">{texts.projects}</h1>
+                  <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+                    {language === 'es' 
+                      ? "Algunos de nuestros proyectos más destacados en diferentes regiones de Costa Rica"
+                      : "Some of our most outstanding projects in different regions of Costa Rica"}
+                  </p>
+                </div>
+
+                <div className="project-grid">
+                  {projects.map(project => (
+                    <div key={project.id} className="project-card">
+                      <img src={project.image} alt={project.title} />
+                      <div className="project-overlay">
+                        <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
+                        <p className="text-gray-300 mb-2">{project.location}</p>
+                        <p className="text-gray-400 text-sm">{project.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-center mt-12">
+                  <button className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-8 py-4 rounded-lg font-bold transition transform hover:scale-105">
+                    {texts.viewGallery}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+
+          const CertificationsPage = () => (
+            <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="text-center mb-16">
+                  <h1 className="text-5xl font-bold text-white mb-4">{texts.certifications}</h1>
+                  <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+                    {language === 'es' 
+                      ? "Certificaciones y acreditaciones que respaldan nuestra calidad y profesionalismo"
+                      : "Certifications and accreditations that support our quality and professionalism"}
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {certifications.map(cert => (
+                    <div key={cert.id} className="certification-card">
+                      <div className="bg-yellow-600/20 w-16 h-16 rounded-lg flex items-center justify-center mb-4">
+                        <Award className="w-8 h-8 text-yellow-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">{cert.name}</h3>
+                      <p className="text-gray-400 mb-2">{cert.organization}</p>
+                      <p className="text-yellow-500 font-semibold">{cert.year}</p>
+                      <button className="mt-4 text-yellow-500 hover:text-yellow-400 font-medium flex items-center gap-2">
+                        {texts.viewCertificate}
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+
+          const WorkWithUsPage = () => {
+            const [applicationData, setApplicationData] = useState({
+              position: '',
+              name: '',
+              email: '',
+              phone: '',
+              experience: '',
+              resume: null
+            });
+
+            const handleChange = (e) => {
+              const { name, value } = e.target;
+              setApplicationData(prevState => ({
+                ...prevState,
+                [name]: value
+              }));
+            };
+
+            const handleFileChange = (e) => {
+              setApplicationData(prevState => ({
+                ...prevState,
+                resume: e.target.files[0]
+              }));
+            };
+
+            const handleSubmit = (e) => {
+              e.preventDefault();
+              alert(language === 'es' 
+                ? `¡Solicitud enviada para ${applicationData.position}! Te contactaremos pronto.` 
+                : `Application submitted for ${applicationData.position}! We'll contact you soon.`);
+              setApplicationData({
+                position: '',
+                name: '',
+                email: '',
+                phone: '',
+                experience: '',
+                resume: null
+              });
+            };
+
+            return (
+              <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                  <div className="text-center mb-16">
+                    <h1 className="text-5xl font-bold text-white mb-4">{texts.workWithUs}</h1>
+                    <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+                      {language === 'es' 
+                        ? "Únete a nuestro equipo de profesionales y forma parte de una empresa líder en soluciones eléctricas"
+                        : "Join our team of professionals and be part of a leading company in electrical solutions"}
+                    </p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-8">{language === 'es' ? "Posiciones Disponibles" : "Available Positions"}</h2>
+                      
+                      <div className="space-y-6">
+                        {jobPositions.map(job => (
+                          <div key={job.id} className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-6">
+                            <h3 className="text-xl font-bold text-white mb-2">{job.title}</h3>
+                            <div className="flex items-center gap-4 text-gray-400 mb-4">
+                              <div className="flex items-center gap-1">
+                                <MapPin className="w-4 h-4" />
+                                <span>{job.location}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-4 h-4" />
+                                <span>{job.type}</span>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => setApplicationData(prev => ({...prev, position: job.title}))}
+                              className="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-2 rounded-lg font-bold transition"
+                            >
+                              {texts.applyNow}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
+                      <h2 className="text-3xl font-bold text-white mb-8">{language === 'es' ? "Solicitud de Empleo" : "Job Application"}</h2>
+                      
+                      <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                          <label className="block text-white font-semibold mb-2">{texts.position}</label>
+                          <select 
+                            name="position"
+                            value={applicationData.position}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                            required
+                          >
+                            <option value="">{language === 'es' ? "Selecciona una posición" : "Select a position"}</option>
+                            {jobPositions.map(job => (
+                              <option key={job.id} value={job.title}>{job.title}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-white font-semibold mb-2">{texts.fullName}</label>
+                          <input 
+                            type="text"
+                            name="name"
+                            value={applicationData.name}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-white font-semibold mb-2">{texts.email}</label>
+                          <input 
+                            type="email"
+                            name="email"
+                            value={applicationData.email}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-white font-semibold mb-2">{texts.phone}</label>
+                          <input 
+                            type="tel"
+                            name="phone"
+                            value={applicationData.phone}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-white font-semibold mb-2">
+                            {language === 'es' ? "Experiencia (años)" : "Experience (years)"}
+                          </label>
+                          <input 
+                            type="number"
+                            name="experience"
+                            value={applicationData.experience}
+                            onChange={handleChange}
+                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-white font-semibold mb-2">{texts.uploadResume}</label>
+                          <input 
+                            type="file"
+                            name="resume"
+                            onChange={handleFileChange}
+                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                            required
+                          />
+                        </div>
+
+                        <button 
+                          type="submit" 
+                          className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105"
+                        >
+                          {texts.submitApplication}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          };
+
           const ContactoPage = () => (
             <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <div className="text-center mb-12">
-                  <h1 className="text-5xl font-bold text-white mb-4">Contáctanos</h1>
-                  <p className="text-gray-400 text-lg">Estamos aquí para ayudarte con tu proyecto eléctrico</p>
+                  <h1 className="text-5xl font-bold text-white mb-4">{texts.contactUs}</h1>
+                  <p className="text-gray-400 text-lg">{language === 'es' ? "Estamos aquí para ayudarte con tu proyecto eléctrico" : "We are here to help you with your electrical project"}</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
-                    <h2 className="text-3xl font-bold text-white mb-8">Información de Contacto</h2>
+                    <h2 className="text-3xl font-bold text-white mb-8">{language === 'es' ? "Información de Contacto" : "Contact Information"}</h2>
                     
                     <div className="space-y-6">
                       <div className="flex items-start gap-4">
@@ -514,7 +1062,7 @@
                           <Phone className="w-6 h-6 text-yellow-500" />
                         </div>
                         <div>
-                          <h3 className="text-white font-semibold mb-1 text-lg">Teléfono</h3>
+                          <h3 className="text-white font-semibold mb-1 text-lg">{texts.phone}</h3>
                           <p className="text-gray-400">+506 8888-0000</p>
                         </div>
                       </div>
@@ -524,7 +1072,7 @@
                           <Mail className="w-6 h-6 text-yellow-500" />
                         </div>
                         <div>
-                          <h3 className="text-white font-semibold mb-1 text-lg">Email</h3>
+                          <h3 className="text-white font-semibold mb-1 text-lg">{texts.email}</h3>
                           <p className="text-gray-400">contacto@electrosa.com</p>
                         </div>
                       </div>
@@ -534,7 +1082,7 @@
                           <MapPin className="w-6 h-6 text-yellow-500" />
                         </div>
                         <div>
-                          <h3 className="text-white font-semibold mb-1 text-lg">Ubicación</h3>
+                          <h3 className="text-white font-semibold mb-1 text-lg">{texts.location}</h3>
                           <p className="text-gray-400">Puerto Jiménez, Puntarenas</p>
                           <p className="text-gray-400">Costa Rica</p>
                         </div>
@@ -545,49 +1093,49 @@
                           <Clock className="w-6 h-6 text-yellow-500" />
                         </div>
                         <div>
-                          <h3 className="text-white font-semibold mb-1 text-lg">Horario</h3>
-                          <p className="text-gray-400">Lunes a Viernes: 8:00 AM - 6:00 PM</p>
-                          <p className="text-gray-400">Sábados: 9:00 AM - 2:00 PM</p>
-                          <p className="text-yellow-500 font-semibold mt-2">Emergencias 24/7</p>
+                          <h3 className="text-white font-semibold mb-1 text-lg">{texts.schedule}</h3>
+                          <p className="text-gray-400">{language === 'es' ? "Lunes a Viernes: 8:00 AM - 6:00 PM" : "Monday to Friday: 8:00 AM - 6:00 PM"}</p>
+                          <p className="text-gray-400">{language === 'es' ? "Sábados: 9:00 AM - 2:00 PM" : "Saturdays: 9:00 AM - 2:00 PM"}</p>
+                          <p className="text-yellow-500 font-semibold mt-2">{texts.emergency}</p>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
-                    <h2 className="text-3xl font-bold text-white mb-8">Envíanos un Mensaje</h2>
+                    <h2 className="text-3xl font-bold text-white mb-8">{language === 'es' ? "Envíanos un Mensaje" : "Send Us a Message"}</h2>
                     
                     <form className="space-y-4">
                       <div>
                         <input 
                           type="text"
-                          placeholder="Nombre"
+                          placeholder={texts.name}
                           className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
                         />
                       </div>
                       <div>
                         <input 
                           type="email"
-                          placeholder="Email"
+                          placeholder={texts.email}
                           className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
                         />
                       </div>
                       <div>
                         <input 
                           type="tel"
-                          placeholder="Teléfono"
+                          placeholder={texts.phone}
                           className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
                         />
                       </div>
                       <div>
                         <textarea 
                           rows="5"
-                          placeholder="Mensaje"
+                          placeholder={texts.message}
                           className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
                         />
                       </div>
                       <button type="submit" className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-3 rounded-lg font-bold transition transform hover:scale-105">
-                        Enviar Mensaje
+                        {texts.sendMessage}
                       </button>
                     </form>
                   </div>
@@ -596,20 +1144,171 @@
             </div>
           );
 
+          const CotizacionPage = () => {
+            const [formData, setFormData] = useState({
+              service: selectedService || '',
+              area: '',
+              description: '',
+              name: '',
+              phone: '',
+              email: ''
+            });
+
+            const handleChange = (e) => {
+              const { name, value } = e.target;
+              setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+              }));
+            };
+
+            const handleSubmit = (e) => {
+              e.preventDefault();
+              alert(language === 'es' 
+                ? `¡Cotización enviada para ${formData.service}! Te contactaremos pronto.` 
+                : `Quote submitted for ${formData.service}! We'll contact you soon.`);
+              setCurrentPage('servicios');
+            };
+
+            return (
+              <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                  <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
+                    <div className="text-center mb-8">
+                      <h1 className="text-4xl font-bold text-white mb-2">
+                        {language === 'es' ? 'Solicitar Cotización' : 'Request Quote'}
+                      </h1>
+                      <p className="text-gray-400">
+                        {language === 'es' ? 'Complete los detalles de su proyecto' : 'Complete your project details'}
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      {/* Selector de servicio - NUEVO CAMPO AGREGADO */}
+                      <div>
+                        <label className="block text-white font-semibold mb-2 text-lg">
+                          {texts.selectService}
+                        </label>
+                        <select 
+                          name="service"
+                          value={formData.service}
+                          onChange={handleChange}
+                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                          required
+                        >
+                          <option value="" disabled>
+                            {language === 'es' ? '/ Selecciona un servicio' : '/ Select a service'}
+                          </option>
+                          {servicios.map((servicio, index) => (
+                            <option key={index} value={servicio.titulo}>
+                              {servicio.titulo}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-semibold mb-2 text-lg">
+                          {texts.projectArea}
+                        </label>
+                        <input 
+                          type="text"
+                          name="area"
+                          placeholder="5:100"
+                          value={formData.area}
+                          onChange={handleChange}
+                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-semibold mb-2 text-lg">
+                          {texts.projectDescription}
+                        </label>
+                        <textarea 
+                          rows="4"
+                          name="description"
+                          placeholder={language === 'es' ? "Describe tu proyecto..." : "Describe your project..."}
+                          value={formData.description}
+                          onChange={handleChange}
+                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-semibold mb-2 text-lg">
+                          {texts.fullName}
+                        </label>
+                        <input 
+                          type="text"
+                          name="name"
+                          placeholder={language === 'es' ? "Tu nombre" : "Your name"}
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-semibold mb-2 text-lg">
+                          {texts.phone}
+                        </label>
+                        <input 
+                          type="tel"
+                          name="phone"
+                          placeholder="8888-0000"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-white font-semibold mb-2 text-lg">
+                          {texts.email}
+                        </label>
+                        <input 
+                          type="email"
+                          name="email"
+                          placeholder="tu@email.com"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500"
+                          required
+                        />
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105"
+                      >
+                        {texts.requestQuote}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            );
+          };
+
           const LoginPage = () => (
             <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen flex items-center">
               <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-8">
                   <div className="text-center mb-8">
                     <User className="w-20 h-20 text-yellow-500 mx-auto mb-4" />
-                    <h1 className="text-4xl font-bold text-white mb-2">Portal de Clientes</h1>
-                    <p className="text-gray-400">Accede a tu cuenta ELECTROSA</p>
+                    <h1 className="text-4xl font-bold text-white mb-2">{texts.clientPortal}</h1>
+                    <p className="text-gray-400">{texts.accessAccount}</p>
                   </div>
 
                   {!isLoggedIn ? (
                     <form className="space-y-6">
                       <div>
-                        <label className="block text-gray-300 mb-2 font-semibold">Email</label>
+                        <label className="block text-gray-300 mb-2 font-semibold">{texts.email}</label>
                         <input 
                           type="email"
                           placeholder="tu@email.com"
@@ -617,7 +1316,7 @@
                         />
                       </div>
                       <div>
-                        <label className="block text-gray-300 mb-2 font-semibold">Contraseña</label>
+                        <label className="block text-gray-300 mb-2 font-semibold">{texts.password}</label>
                         <input 
                           type="password"
                           placeholder="••••••••"
@@ -629,36 +1328,36 @@
                         onClick={() => setIsLoggedIn(true)}
                         className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-3 rounded-lg font-bold transition transform hover:scale-105"
                       >
-                        Iniciar Sesión
+                        {texts.login}
                       </button>
                       <div className="text-center">
-                        <a href="#" className="text-yellow-500 hover:text-yellow-400 text-sm">¿Olvidaste tu contraseña?</a>
+                        <a href="#" className="text-yellow-500 hover:text-yellow-400 text-sm">{texts.forgotPassword}</a>
                       </div>
                     </form>
                   ) : (
                     <div className="space-y-6">
                       <div className="bg-black border border-yellow-600/30 rounded-lg p-6">
-                        <h3 className="text-2xl font-bold text-white mb-4">Bienvenido de nuevo</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4">{texts.welcomeBack}</h3>
                         <p className="text-gray-400 mb-6">cliente@ejemplo.com</p>
                         <div className="space-y-3">
-                          <button onClick={() => setCurrentPage('pagos')} className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-3 rounded-lg flex items-center justify-between transition border border-yellow-600/20">
+                          <button className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-3 rounded-lg flex items-center justify-between transition border border-yellow-600/20">
                             <span className="flex items-center gap-2">
-                              <CreditCard className="w-5 h-5 text-yellow-500" />
-                              Mis Pagos
+                              <User className="w-5 h-5 text-yellow-500" />
+                              {texts.myProfile}
                             </span>
                             <ChevronRight className="w-5 h-5" />
                           </button>
                           <button className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-3 rounded-lg flex items-center justify-between transition border border-yellow-600/20">
                             <span className="flex items-center gap-2">
-                              <Zap className="w-5 h-5 text-yellow-500" />
-                              Mis Proyectos
+                              <Award className="w-5 h-5 text-yellow-500" />
+                              {texts.myProjects}
                             </span>
                             <ChevronRight className="w-5 h-5" />
                           </button>
                           <button className="w-full bg-gray-900 hover:bg-gray-800 text-white px-4 py-3 rounded-lg flex items-center justify-between transition border border-yellow-600/20">
                             <span className="flex items-center gap-2">
                               <Mail className="w-5 h-5 text-yellow-500" />
-                              Mensajes
+                              {texts.messages}
                             </span>
                             <ChevronRight className="w-5 h-5" />
                           </button>
@@ -666,7 +1365,7 @@
                             onClick={() => setIsLoggedIn(false)}
                             className="w-full bg-red-600 hover:bg-red-500 text-white px-4 py-3 rounded-lg font-semibold transition"
                           >
-                            Cerrar Sesión
+                            {texts.logout}
                           </button>
                         </div>
                       </div>
@@ -677,212 +1376,115 @@
             </div>
           );
 
-          const PagosPage = () => (
-            <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div className="text-center mb-12">
-                  <CreditCard className="w-20 h-20 text-yellow-500 mx-auto mb-4" />
-                  <h1 className="text-5xl font-bold text-white mb-4">Pagos en Línea</h1>
-                  <p className="text-gray-400 text-lg">Realiza tus pagos de forma segura y rápida</p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
-                  <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-6">
-                    <h3 className="text-2xl font-bold text-white mb-4">Facturas Pendientes</h3>
-                    <div className="space-y-3">
-                      <div className="bg-black border border-yellow-500/30 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-400 text-sm">Factura #0001234</span>
-                          <span className="bg-yellow-600/20 text-yellow-500 px-3 py-1 rounded-full text-xs font-semibold">Pendiente</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-white font-semibold">Mantenimiento Solar</span>
-                          <span className="text-2xl font-bold text-yellow-500">₡45,000</span>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-2">Vence: 15 Nov 2025</p>
-                      </div>
-                      
-                      <div className="bg-black border border-gray-700 rounded-lg p-4 opacity-60">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-400 text-sm">Factura #0001189</span>
-                          <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-semibold">Pagada</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-white font-semibold">Instalación Domótica</span>
-                          <span className="text-xl font-bold text-gray-500">₡125,000</span>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-2">Pagada: 20 Oct 2025</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-6">
-                    <h3 className="text-2xl font-bold text-white mb-4">Realizar Pago</h3>
-                    <form className="space-y-4">
-                      <div>
-                        <label className="block text-gray-300 mb-2 text-sm font-semibold">Número de Factura</label>
-                        <input 
-                          type="text"
-                          placeholder="0001234"
-                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-gray-300 mb-2 text-sm font-semibold">Monto</label>
-                        <input 
-                          type="text"
-                          value="₡45,000"
-                          readOnly
-                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-2 text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-gray-300 mb-2 text-sm font-semibold">Método de Pago</label>
-                        <select className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500">
-                          <option>Tarjeta de Crédito/Débito</option>
-                          <option>SINPE Móvil</option>
-                          <option>Transferencia Bancaria</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-gray-300 mb-2 text-sm font-semibold">Número de Tarjeta</label>
-                        <input 
-                          type="text"
-                          placeholder="1234 5678 9012 3456"
-                          className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-gray-300 mb-2 text-sm font-semibold">Vencimiento</label>
-                          <input 
-                            type="text"
-                            placeholder="MM/AA"
-                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-gray-300 mb-2 text-sm font-semibold">CVV</label>
-                          <input 
-                            type="text"
-                            placeholder="123"
-                            className="w-full bg-black border border-yellow-600/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-500"
-                          />
-                        </div>
-                      </div>
-                      <button type="submit" className="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black px-6 py-3 rounded-lg font-bold transition shadow-lg shadow-yellow-600/50 flex items-center justify-center gap-2 transform hover:scale-105">
-                        <CreditCard className="w-5 h-5" />
-                        Pagar Ahora
-                      </button>
-                      <p className="text-gray-500 text-xs text-center">🔒 Transacción segura y encriptada</p>
-                    </form>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-yellow-600/20 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-4">Historial de Pagos</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-yellow-600/20">
-                          <th className="text-left text-gray-400 py-3 px-4 font-semibold">Fecha</th>
-                          <th className="text-left text-gray-400 py-3 px-4 font-semibold">Factura</th>
-                          <th className="text-left text-gray-400 py-3 px-4 font-semibold">Descripción</th>
-                          <th className="text-right text-gray-400 py-3 px-4 font-semibold">Monto</th>
-                          <th className="text-center text-gray-400 py-3 px-4 font-semibold">Estado</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-b border-gray-800">
-                          <td className="py-3 px-4 text-gray-300">20 Oct 2025</td>
-                          <td className="py-3 px-4 text-white">#0001189</td>
-                          <td className="py-3 px-4 text-gray-300">Instalación Domótica</td>
-                          <td className="py-3 px-4 text-right text-white font-semibold">₡125,000</td>
-                          <td className="py-3 px-4 text-center">
-                            <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs font-semibold">Pagada</span>
-                          </td>
-                        </tr>
-                        <tr className="border-b border-gray-800">
-                          <td className="py-3 px-4 text-gray-300">05 Sep 2025</td>
-                          <td className="py-3 px-4 text-white">#0001145</td>
-                          <td className="py-3 px-4 text-gray-300">Paneles Solares</td>
-                          <td className="py-3 px-4 text-right text-white font-semibold">₡850,000</td>
-                          <td className="py-3 px-4 text-center">
-                            <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs font-semibold">Pagada</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="py-3 px-4 text-gray-300">12 Ago 2025</td>
-                          <td className="py-3 px-4 text-white">#0001098</td>
-                          <td className="py-3 px-4 text-gray-300">Revisión Eléctrica</td>
-                          <td className="py-3 px-4 text-right text-white font-semibold">₡35,000</td>
-                          <td className="py-3 px-4 text-center">
-                            <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs font-semibold">Pagada</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
           const Footer = () => (
             <footer className="bg-black border-t border-yellow-600/20 py-12">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid md:grid-cols-4 gap-8 mb-8">
                   <div>
-                    <LogoElectrosa className="mb-4" />
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                      Soluciones eléctricas profesionales con más de 15 años de experiencia en Costa Rica.
+                    <LogoElectrosa onClick={() => setCurrentPage('home')} className="cursor-pointer" />
+                    <p className="text-gray-400 text-sm leading-relaxed mt-4">
+                      {language === 'es' 
+                        ? "Soluciones eléctricas profesionales con más de 15 años de experiencia en Costa Rica."
+                        : "Professional electrical solutions with over 15 years of experience in Costa Rica."}
                     </p>
                   </div>
                   
                   <div>
-                    <h4 className="text-white font-bold mb-4 text-lg">Servicios</h4>
+                    <h4 className="text-white font-bold mb-4 text-lg">{texts.services}</h4>
                     <ul className="space-y-2 text-gray-400 text-sm">
-                      <li><a href="#" className="hover:text-yellow-500 transition">Electricidad Residencial</a></li>
-                      <li><a href="#" className="hover:text-yellow-500 transition">Mantenimiento</a></li>
-                      <li><a href="#" className="hover:text-yellow-500 transition">Paneles Solares</a></li>
-                      <li><a href="#" className="hover:text-yellow-500 transition">Domótica</a></li>
+                      <li>
+                        <button onClick={() => setCurrentPage('servicios')} className="hover:text-yellow-500 transition text-left">
+                          {texts.residentialElectricity}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('servicios')} className="hover:text-yellow-500 transition text-left">
+                          {texts.electricalMaintenance}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('servicios')} className="hover:text-yellow-500 transition text-left">
+                          {texts.solarPanels}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('servicios')} className="hover:text-yellow-500 transition text-left">
+                          {texts.homeAutomation}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('servicios')} className="hover:text-yellow-500 transition text-left">
+                          {texts.commercialElectricity}
+                        </button>
+                      </li>
                     </ul>
                   </div>
                   
                   <div>
-                    <h4 className="text-white font-bold mb-4 text-lg">Empresa</h4>
+                    <h4 className="text-white font-bold mb-4 text-lg">{texts.company}</h4>
                     <ul className="space-y-2 text-gray-400 text-sm">
-                      <li><a href="#" className="hover:text-yellow-500 transition">Sobre Nosotros</a></li>
-                      <li><a href="#" className="hover:text-yellow-500 transition">Proyectos</a></li>
-                      <li><a href="#" className="hover:text-yellow-500 transition">Certificaciones</a></li>
-                      <li><a href="#" className="hover:text-yellow-500 transition">Trabaja con Nosotros</a></li>
+                      <li>
+                        <button onClick={() => setCurrentPage('aboutus')} className="hover:text-yellow-500 transition text-left">
+                          {texts.aboutUs}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('projects')} className="hover:text-yellow-500 transition text-left">
+                          {texts.projects}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('certifications')} className="hover:text-yellow-500 transition text-left">
+                          {texts.certifications}
+                        </button>
+                      </li>
+                      <li>
+                        <button onClick={() => setCurrentPage('workwithus')} className="hover:text-yellow-500 transition text-left">
+                          {texts.workWithUs}
+                        </button>
+                      </li>
                     </ul>
                   </div>
                   
                   <div>
-                    <h4 className="text-white font-bold mb-4 text-lg">Contacto</h4>
+                    <h4 className="text-white font-bold mb-4 text-lg">{texts.contact}</h4>
                     <ul className="space-y-2 text-gray-400 text-sm">
                       <li className="flex items-center gap-2">
                         <Phone className="w-4 h-4" />
-                        +506 8888-0000
+                        <a href="tel:+50688880000" className="hover:text-yellow-500 transition">+506 8888-0000</a>
                       </li>
                       <li className="flex items-center gap-2">
                         <Mail className="w-4 h-4" />
-                        contacto@electrosa.com
+                        <a href="mailto:contacto@electrosa.com" className="hover:text-yellow-500 transition">contacto@electrosa.com</a>
                       </li>
                       <li className="flex items-center gap-2">
                         <MapPin className="w-4 h-4" />
-                        Puerto Jiménez, Puntarenas
+                        <button onClick={() => setCurrentPage('contacto')} className="hover:text-yellow-500 transition text-left">
+                          Puerto Jiménez, Puntarenas
+                        </button>
                       </li>
                     </ul>
                   </div>
                 </div>
                 
                 <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-                  <p>&copy; 2025 ELECTROSA - Electrical Specialized. Todos los derechos reservados.</p>
+                  <p>&copy; 2025 ELECTROSA - Electrical Specialized. {texts.rights}.</p>
                 </div>
               </div>
             </footer>
+          );
+
+          const WhatsAppButton = () => (
+            <a
+              href="https://wa.me/50688880000?text=Hola,%20me%20interesan%20sus%20servicios%20eléctricos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whatsapp-float"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893-.001-3.189-1.262-6.209-3.553-8.485"/>
+              </svg>
+            </a>
           );
 
           return (
@@ -891,19 +1493,22 @@
               
               {currentPage === 'home' && <HomePage />}
               {currentPage === 'servicios' && <ServiciosPage />}
-              {currentPage === 'cotizador' && <CotizadorPage />}
+              {currentPage === 'aboutus' && <AboutUsPage />}
+              {currentPage === 'projects' && <ProjectsPage />}
+              {currentPage === 'certifications' && <CertificationsPage />}
+              {currentPage === 'workwithus' && <WorkWithUsPage />}
               {currentPage === 'contacto' && <ContactoPage />}
               {currentPage === 'login' && <LoginPage />}
-              {currentPage === 'pagos' && <PagosPage />}
+              {currentPage === 'cotizacion' && <CotizacionPage />}
               
               <Footer />
+              <WhatsAppButton />
             </div>
           );
         };
 
         // Renderizar la aplicación
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<ElectroosaApp />);
+        ReactDOM.render(<ElectroosaApp />, document.getElementById('root'));
     </script>
 </body>
 </html>
