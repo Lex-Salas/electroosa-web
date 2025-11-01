@@ -893,19 +893,23 @@
               }));
             };
 
-            const handleSubmit = (e) => {
+            const handleSubmit = async (e) => {
               e.preventDefault();
-              alert(language === 'es' 
-                ? `¡Solicitud enviada para ${applicationData.position}! Te contactaremos pronto.` 
-                : `Application submitted for ${applicationData.position}! We'll contact you soon.`);
-              setApplicationData({
-                position: '',
-                name: '',
-                email: '',
-                phone: '',
-                experience: '',
-                resume: null
-              });
+              try {
+                const res = await fetch("/api/send-application", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(applicationData)
+                });
+                if (res.ok) {
+                  alert("✅ Solicitud enviada correctamente");
+                } else {
+                  alert("❌ Error al enviar la solicitud");
+                }
+              } catch (err) {
+                console.error(err);
+                alert("❌ Error de conexión con el servidor");
+              }
             };
 
             return (
@@ -1162,13 +1166,26 @@
               }));
             };
 
-            const handleSubmit = (e) => {
+            const handleSubmit = async (e) => {
               e.preventDefault();
-              alert(language === 'es' 
-                ? `¡Cotización enviada para ${formData.service}! Te contactaremos pronto.` 
-                : `Quote submitted for ${formData.service}! We'll contact you soon.`);
-              setCurrentPage('servicios');
+              try {
+                const res = await fetch("/api/send-quote", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(formData)
+                });
+                if (res.ok) {
+                  alert("✅ Cotización enviada correctamente");
+                  setCurrentPage("servicios");
+                } else {
+                  alert("❌ Error al enviar la cotización");
+                }
+              } catch (err) {
+                console.error(err);
+                alert("❌ Error de conexión con el servidor");
+              }
             };
+
 
             return (
               <div className="pt-20 bg-gradient-to-b from-black to-gray-900 min-h-screen">
